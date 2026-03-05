@@ -1,7 +1,7 @@
 import {useCallback, useRef} from 'react';
 import type {ViewStyle} from 'react-native';
 import {StyleSheet} from 'react-native';
-import Reanimated, {Easing, useAnimatedStyle, useSharedValue, withTiming} from 'react-native-reanimated';
+import Reanimated, {useAnimatedStyle, useSharedValue} from 'react-native-reanimated';
 import {scheduleOnRN} from 'react-native-worklets';
 import Logo from '@assets/images/new-expensify-dark.svg';
 import ImageSVG from '@components/ImageSVG';
@@ -34,23 +34,9 @@ function SplashScreenHider({onHide = () => {}}: SplashScreenHiderProps): SplashS
         hideHasBeenCalled.current = true;
 
         BootSplash.hide().then(() => {
-            scale.set(
-                withTiming(0, {
-                    duration: 200,
-                    easing: Easing.back(2),
-                }),
-            );
-
-            opacity.set(
-                withTiming(
-                    0,
-                    {
-                        duration: 250,
-                        easing: Easing.out(Easing.ease),
-                    },
-                    () => scheduleOnRN(onHide),
-                ),
-            );
+            scale.set(0);
+            opacity.set(0);
+            scheduleOnRN(onHide);
         });
     }, [opacity, scale, onHide]);
 
