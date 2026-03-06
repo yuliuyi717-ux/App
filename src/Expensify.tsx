@@ -11,7 +11,6 @@ import {useInitialURLActions} from './components/InitialURLContextProvider';
 import ProactiveAppReviewModalManager from './components/ProactiveAppReviewModalManager';
 import ScreenShareRequestModal from './components/ScreenShareRequestModal';
 import AppleAuthWrapper from './components/SignInButtons/AppleAuthWrapper';
-import SplashScreenHider from './components/SplashScreenHider';
 import UpdateAppModal from './components/UpdateAppModal';
 import CONFIG from './CONFIG';
 import CONST from './CONST';
@@ -27,6 +26,7 @@ import * as EmojiPickerAction from './libs/actions/EmojiPickerAction';
 // This lib needs to be imported, but it has nothing to export since all it contains is an Onyx connection
 import './libs/actions/replaceOptimisticReportWithActualReport';
 import * as ActiveClientManager from './libs/ActiveClientManager';
+import BootSplash from './libs/BootSplash';
 import {isSafari} from './libs/Browser';
 import {growlRef} from './libs/Growl';
 import Log from './libs/Log';
@@ -205,6 +205,14 @@ function Expensify() {
         endSpan(CONST.TELEMETRY.SPAN_BOOTSPLASH.SPLASH_HIDER);
     }, [setSplashScreenState]);
 
+    useEffect(() => {
+        if (!shouldHideSplash) {
+            return;
+        }
+
+        BootSplash.hide().then(onSplashHide);
+    }, [shouldHideSplash, onSplashHide]);
+
     useLayoutEffect(() => {
         // Initialize this client as being an active client
         ActiveClientManager.init();
@@ -316,7 +324,6 @@ function Expensify() {
                     initialUrl={initialUrl}
                 />
             )}
-            {shouldHideSplash && <SplashScreenHider onHide={onSplashHide} />}
         </>
     );
 }
