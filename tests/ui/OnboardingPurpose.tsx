@@ -184,4 +184,36 @@ describe('OnboardingPurpose Page', () => {
         unmount();
         await waitForBatchedUpdatesWithAct();
     });
+
+    it('should navigate to workspace optional when private domain user selects EMPLOYER', async () => {
+        await TestHelper.signInWithTestUser();
+
+        await act(async () => {
+            await Onyx.merge(ONYXKEYS.ACCOUNT, {
+                isFromPublicDomain: false,
+                hasAccessibleDomainPolicies: true,
+            });
+            await Onyx.merge(ONYXKEYS.FORMS.ONBOARDING_PERSONAL_DETAILS_FORM, {
+                firstName: 'Test',
+                lastName: 'User',
+            });
+        });
+
+        const {unmount} = renderOnboardingPurposePage(SCREENS.ONBOARDING.PURPOSE, {backTo: ''});
+
+        await waitForBatchedUpdatesWithAct();
+
+        const user = userEvent.setup();
+        const employerLabel = translatePurpose(CONST.ONBOARDING_CHOICES.EMPLOYER);
+        const employerOption = screen.getByLabelText(employerLabel);
+        await user.press(employerOption);
+
+        await waitFor(() => {
+            expect(navigate).toHaveBeenCalledWith(ROUTES.ONBOARDING_WORKSPACE.getRoute(''));
+        });
+        expect(mockCompleteOnboarding).not.toHaveBeenCalled();
+
+        unmount();
+        await waitForBatchedUpdatesWithAct();
+    });
 });
